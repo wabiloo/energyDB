@@ -1,6 +1,7 @@
 var mysql   = require('mysql');
 var moment  = require('moment');
 var _ 		= require('lodash');
+var plotly 	= require('plotly')("fabre.lambeau", "clzjsknyci")
 
 /*var mysql_db = mysql.createConnection({
   host     : 'elysium.krystal.co.uk',
@@ -24,6 +25,7 @@ getConsumption('G', function(readings) {
 	mapReadingsToBuckets(buckets, readings);	
 
 	displayBuckets(buckets);
+	plotBuckets(buckets);
 });
 
 mysql_db.end();
@@ -145,5 +147,43 @@ function displayBuckets(buckets) {
 			console.log("    %d. reading %d, %s-%s (%d kWh) - %d days = %d kWh", i+1, r.reading.ReadingId, r.reading.StartDate, r.reading.EndDate, r.reading.Consumption, r.overlap.duration, r.overlap.consumption);
 		});
 		console.log("  => Total consumption: %d kWh", bucket.consumption);
-	})
+	});
+}
+
+function plotBuckets(buckets) {
+	var years = _.groupBy(buckets, 'year');
+	data = _.map(years, function(yeardata, key) {
+		return {
+			x: _.map(yeardata, 'month'),
+			y: _.map(yeardata, 'consumption')
+		};
+	});
+
+	console.log(data);
+
+	var layout = {fileopt : "overwrite", filename : "simple-node-example"};
+
+	plotly.plot(data, layout, function (err, msg) {
+		if (err) return console.log(err);
+		console.log(msg);
+	});
+
+}
+
+
+function plotBuckets_old(buckets) {
+	var datax = _.map(buckets, function(bucket) {
+		return bucket.id;
+	});
+	var datay = _.map(buckets, function(bucket) {
+		return bucket.consumption;
+	});
+
+	var data = [{x:datax, y:datay, type: 'bar'}];
+	var layout = {fileopt : "overwrite", filename : "simple-node-example"};
+
+	plotly.plot(data, layout, function (err, msg) {
+		if (err) return console.log(err);
+		console.log(msg);
+	});
 }
