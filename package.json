@@ -4,6 +4,7 @@
   "description": "A project to record, calculate and compare energy consumption data",
   "main": "index.js",
   "dependencies": {
+    "fast-csv": "^2.3.0",
     "lodash": "^4.16.4",
     "moment": "^2.15.1",
     "mysql": "^2.11.1",
